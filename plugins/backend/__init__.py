@@ -199,6 +199,10 @@ class Backend(BackendCore, BackendBlocklyLogics):
         self._sh_dir = self._sh.base_dir
         self.visu_plugin = None
         self.visu_plugin_version = '1.0.0'
+        
+        #BackendCore.__init__()
+        BackendBlocklyLogics.__init__()
+        
 
     def html_escape(self, str):
         return html_escape(str)

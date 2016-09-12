@@ -48,6 +48,16 @@ class BackendBlocklyLogics:
     """
     Google Blockly for Logics
     """
+    
+    def __init__(self):
+    	self._fn_py = self._sh._logic_dir + "blockly_logics.py"
+        self._fn_xml = self._sh._logic_dir + "blockly_logics.xml"
+        
+    	with open(self._fn_py, 'w') as fpy:
+            self._pycode = fpy.read(py)
+        self.add_logic_to_scheduler()
+    	
+    	
     @cherrypy.expose
     def logics_blockly_html(self):
         self.find_visu_plugin()
@@ -57,8 +67,10 @@ class BackendBlocklyLogics:
                            dyn_sh_toolbox=self._DynToolbox(self._sh),
                            visu_plugin=(self.visu_plugin is not None))
 
+
     def _DynToolbox(self, sh):
         return "<sep></sep>\n" + self._build_item_block_tree(self._sh.return_items())
+
 
     def _build_item_block_tree(self, items, cname="Items"):
         """
@@ -86,6 +98,7 @@ class BackendBlocklyLogics:
                     item.return_children(), item._name)
             return xml + '</category>\n'
 
+
     def _build_item_block(self, item):
         if item._type in ['bool', 'num', 'str']:
             n, p, t = item._name, item._path, item.type()
@@ -99,28 +112,30 @@ class BackendBlocklyLogics:
         else:
             return '\n'
 
+
     @cherrypy.expose
     def logics_blockly_load(self):
-        fn_xml = self._sh._logic_dir + "blockly_logics.xml"
-        return serve_file(fn_xml, content_type='application/xml')
+        return serve_file(self._fn_xml, content_type='application/xml')
+
 
     @cherrypy.expose
     def logics_blockly_save(self, py, xml):
         self._pycode = py
         self._xmldata = xml
-        fn_py = self._sh._logic_dir + "blockly_logics.py"
-        fn_xml = self._sh._logic_dir + "blockly_logics.xml"
-        self.logger.debug(
-            "Backend: logics_html: SAVE PY blockly logic = {0}\n '{1}'".format(fn_py, py))
-        with open(fn_py, 'w') as fpy:
-            fpy.write(py)
-        self.logger.debug(
-            "Backend: logics_html: SAVE XML blockly logic = {0}\n '{1}'".format(fn_xml, xml))
-        with open(fn_xml, 'w') as fxml:
-            fxml.write(xml)
+        #self.logger.debug(
+        #    "Backend: logics_html: SAVE PY blockly logic = {0}\n '{1}'".format(self._fn_py, py))
+        with open(self._fn_py, 'w') as fpy:
+            fpy.write(self._pycode)
+        #self.logger.debug(
+        #    "Backend: logics_html: SAVE XML blockly logic = {0}\n '{1}'".format(self._fn_xml, xml))
+        with open(self._fn_xml, 'w') as fxml:
+            fxml.write(self._xmldata)
+            
+        self.add_logic_to_scheduler()
 
-        code = self._pycode
-        bytecode = compile(code, '<string>', 'exec')
+
+	def add_logic_to_scheduler(self):
+        bytecode = compile(self._pycode, '<string>', 'exec')
         s = []
         for name in self._sh.scheduler:
             if name.startswith('blockly_runner'):
@@ -148,6 +163,7 @@ class BackendBlocklyLogics:
                     # logger.info('Blockly Logics: crontabs   => '+ val)
                 elif by == 'watchitem':
                     logic.watch_item = val
-                    # item = self._sh.return_item(val)
+                    item = self._sh.return_item(val)
                     # item.add_logic_trigger(logic)
                     # logger.info('Blockly Logics: watchitems => '+ val)
+
