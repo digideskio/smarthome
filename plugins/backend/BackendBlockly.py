@@ -115,7 +115,9 @@ class BackendBlocklyLogics:
 
     @cherrypy.expose
     def logics_blockly_load(self):
-        return serve_file(self._fn_xml, content_type='application/xml')
+    	with open(self._fn_py, 'r') as fpy:
+            return fpy.read()
+        #return serve_file(self._fn_xml, content_type='application/xml')
 
 
     @cherrypy.expose
