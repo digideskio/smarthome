@@ -51,27 +51,27 @@ class BackendBlocklyLogics:
     
     def __init__(self):
     	self._fn_py = self._sh._logic_dir + "blockly_logics.py"
-        self._fn_xml = self._sh._logic_dir + "blockly_logics.xml"
-        
-    	with open(self._fn_py, 'w') as fpy:
-            self._pycode = fpy.read(py)
-        self.add_logic_to_scheduler()
+    	self._fn_xml = self._sh._logic_dir + "blockly_logics.xml"
     	
+    	#with open(self._fn_py, 'w') as fpy:
+    	self._pycode = open(self._fn_py, 'r').read()
+    	self.add_logic_to_scheduler()
+
     	
     @cherrypy.expose
     def logics_blockly_html(self):
         self.find_visu_plugin()
-
+    
         tmpl = self.env.get_template('logics_blockly.html')
         return tmpl.render(smarthome=self._sh,
                            dyn_sh_toolbox=self._DynToolbox(self._sh),
                            visu_plugin=(self.visu_plugin is not None))
-
-
+    
+    
     def _DynToolbox(self, sh):
         return "<sep></sep>\n" + self._build_item_block_tree(self._sh.return_items())
-
-
+    
+    
     def _build_item_block_tree(self, items, cname="Items"):
         """
         recursive definiert
@@ -89,7 +89,7 @@ class BackendBlocklyLogics:
                 if last_parent_item is None or last_parent_item._path not in item._path:
                     parent_items_sorted.append(item)
                     last_parent_item = item
-
+    
             xml = '<category name="{0} ({1})">\n'.format(
                 cname, len(parent_items_sorted))
             for item in parent_items_sorted:
@@ -97,8 +97,8 @@ class BackendBlocklyLogics:
                 xml += self._build_item_block_tree(
                     item.return_children(), item._name)
             return xml + '</category>\n'
-
-
+    
+    
     def _build_item_block(self, item):
         if item._type in ['bool', 'num', 'str']:
             n, p, t = item._name, item._path, item.type()
@@ -111,15 +111,16 @@ class BackendBlocklyLogics:
             return block
         else:
             return '\n'
-
-
+    
+    
     @cherrypy.expose
     def logics_blockly_load(self):
-    	with open(self._fn_py, 'r') as fpy:
-            return fpy.read()
+    	return open(self._fn_xml, 'r').read()
+    	#with open(self._fn_py, 'r') as fpy:
+        #    return fpy.read()
         #return serve_file(self._fn_xml, content_type='application/xml')
-
-
+    
+    
     @cherrypy.expose
     def logics_blockly_save(self, py, xml):
         self._pycode = py
@@ -134,9 +135,9 @@ class BackendBlocklyLogics:
             fxml.write(self._xmldata)
             
         self.add_logic_to_scheduler()
-
-
-	def add_logic_to_scheduler(self):
+    
+    
+    def add_logic_to_scheduler(self):
         bytecode = compile(self._pycode, '<string>', 'exec')
         s = []
         for name in self._sh.scheduler:
@@ -145,8 +146,8 @@ class BackendBlocklyLogics:
                 s.append(name)
         for name in s:
             self._sh.scheduler.remove(name)
-
-        for line in code.splitlines():
+    
+        for line in self._pycode.splitlines():
             if line and line.startswith('#?#'):
                 id, __, trigger = line[3:].partition(':')
                 by, __, val = trigger.partition('=')
@@ -168,4 +169,4 @@ class BackendBlocklyLogics:
                     item = self._sh.return_item(val)
                     # item.add_logic_trigger(logic)
                     # logger.info('Blockly Logics: watchitems => '+ val)
-
+    

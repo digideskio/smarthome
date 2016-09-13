@@ -200,8 +200,8 @@ class Backend(BackendCore, BackendBlocklyLogics):
         self.visu_plugin = None
         self.visu_plugin_version = '1.0.0'
         
-        #BackendCore.__init__()
-        BackendBlocklyLogics.__init__()
+        #BackendCore.__init__(self)
+        BackendBlocklyLogics.__init__(self)
         
 
     def html_escape(self, str):
