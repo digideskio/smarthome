@@ -7,16 +7,16 @@ Configuration
 Directories
 ===========
 
-In general the home directory of SmartHomeNG will be ``/usr/local/smarthome/``. 
+In general the home directory of SmartHomeNG will be ``/usr/local/smarthome/``.
 There are several subdirectories which are explaned below
 
 ==========    ==========
 directory     description
 ==========    ==========
-bin           contains the core smarthome.py                                          
+bin           contains the core smarthome.py
 dev           development files
-doc           some documentation files reside here (the pages just are just reading) 
-etc           contains the main configuration files 
+doc           some documentation files reside here (the pages just are just reading)
+etc           contains the main configuration files
               (`smarthome.conf`_, `plugin.conf`_, `logic.conf`_ and `logging.yaml`_)
 
 examples      contains some example files for the configuration and the visu plugin
@@ -84,11 +84,11 @@ logic.py. The logic would be started - once - when the system starts.
 etc/plugin.conf
 ---------------
 
-Plugins extend the core functionality of SmartHomeNG. The config files tells SmartHomeNG 
+Plugins extend the core functionality of SmartHomeNG. The config files tells SmartHomeNG
 which plugin to use and which parameters to pass for the execution.
 
 The ``plugins`` directory contains a subdirectory for every available plugin.
-Plugins are configured in the ``plugin.conf`` file. 
+Plugins are configured in the ``plugin.conf`` file.
 
 This example there is a plugin for the knx bus to send and receive telegrams from eibd or knxd
 and may be part plugin.conf:
@@ -106,7 +106,7 @@ and may be part plugin.conf:
       #   date_ga = 1/1/2 # default none
    </pre>
 
-The object name, class name and class path are mandatory. Other attributes 
+The object name, class name and class path are mandatory. Other attributes
 needs to be specified as needed. There is a Readme for every plugin that gives the necessary
 information. To continue reading follow the `plugin <plugin.html>`_ page.
 
@@ -147,13 +147,13 @@ SmartHomeNG can be executed with the following options:
      -i, --interactive  open an interactive shell with tab completion and with
                         verbose logging to the logfile
      -l, --logics       reload all logics
-     -s, --stop         stop SmartHome.py
+     -s, --stop         stop SmartHomeNG
      -q, --quiet        DEPRECATED use logging config (reduce logging to the
                         logfile)
-     -V, --version      show SmartHome.py version
-     --start            start SmartHome.py and detach from console (default)
+     -V, --version      show SmartHomeNG version
+     --start            start SmartHomeNG and detach from console (default)
    </code>
    </pre>
 
-Please be noted that due to the changed nature of logging the -v and -q options are deprecated and will be removed 
+Please be noted that due to the changed nature of logging the -v and -q options are deprecated and will be removed
 in a later release.

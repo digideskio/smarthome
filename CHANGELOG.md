@@ -53,14 +53,14 @@ In Developement
         sh.tools.dt2ts(dt) konvertiert ein datetime in ein Unix Timestamp
         sh.tools.dt2js(dt) konvertiert ein datetime in ein JavaScript Timestamp (Sekunden & Millisekunden)
    * tools.rel2abs()
-   * sh.py -V, -i adding history to interactive mode 
+   * sh.py -V, -i adding history to interactive mode
 
 ## Plugin Features
    * Asterisk: `ast_db` attribute to control Asterisk database entries
    * KNX: new knx_status attribute
    * SQLite: sqlite = init
     sqlite: allowing to set database path via plugin.conf
-   *  cli plugin: adding lt to list 
+   *  cli plugin: adding lt to list
    * RRDTool: rrd = init, db
    * Network Plugin: nw_udp_send
         nw_upd_send = host:port # sendet den Item Wert an den Host/Port
@@ -74,7 +74,7 @@ In Developement
    * Visu: visu => visu_acl = rw & plugin acl
    * predifined items env.core env.system used by smartVISU
    * SQLite: speed improvements
-   * 1-Wire: adding DS18S20 support 
+   * 1-Wire: adding DS18S20 support
    * new config parser: |
    * improving logic response time
 
@@ -151,7 +151,7 @@ In Developement
       * TITLE header template,
       * adding 'unit' attribute to item.conf
       * JQuery: 1.8.3, JQuery Mobile 1.2
-      * Log view  SmartHome.py, Asterisk
+      * Log view  SmartHomeNG, Asterisk
 
 ## Bug Fixes
    * KNX plugin: knx_init/knx_cache could not work if first connection attempt failed
@@ -172,7 +172,7 @@ In Developement
    * Visu Plugin:
       * autogenerate visu pages
       * new input type 'time'
-    * SmartHome.py:
+    * SmartHomeNG:
        * sh.scheduler.change
        * directory structure cleanup: logic => logics
        * sh.tools.dewpoint(): new function to calculate the dewpoint
@@ -262,4 +262,3 @@ Bug Fixes
 ---------
 + knx_ga => knx_send, knx_listen
 + sh.sun.set() provided a timezone aware datetime.
-

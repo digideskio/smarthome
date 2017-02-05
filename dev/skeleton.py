@@ -3,7 +3,7 @@
 #########################################################################
 #  Copyright 2016 <AUTHOR>                                        <EMAIL>
 #########################################################################
-#  This file is part of SmartHomeNG.   
+#  This file is part of SmartHomeNG.
 #
 #  SmartHomeNG is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ class FooClass(SmartPlugin):
         self.logger = logging.getLogger(__name__)
 
     def run(self):
-        logger.debug("run method called")
+        self.logger.debug("run method called")
         self.alive = True
 
     def stop(self):
@@ -54,4 +54,3 @@ class FooClass(SmartPlugin):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s %(message)s')
     FooClass(None).run()
-

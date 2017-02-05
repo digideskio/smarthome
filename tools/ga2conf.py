@@ -4,20 +4,20 @@
 #########################################################################
 # Copyright 2012 KNX-User-Forum e.V.            http://knx-user-forum.de/
 #########################################################################
-#  This file is part of SmartHome.py.   http://smarthome.sourceforge.net/
+#  This file is part of SmartHomeNG.   https://github.com/smarthomeNG/
 #
-#  SmartHome.py is free software: you can redistribute it and/or modify
+#  SmartHomeNG is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SmartHome.py is distributed in the hope that it will be useful,
+#  SmartHomeNG is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SmartHome.py. If not, see <http://www.gnu.org/licenses/>.
+#  along with SmartHomeNG. If not, see <http://www.gnu.org/licenses/>.
 ##########################################################################
 
 import os
@@ -49,7 +49,7 @@ def write_dpt(dpt, depth, f):
 def write_dict(a, depth, f):
     if 'sh_attributes' in a.keys():
         if a['sh_attributes']['knx_dpt']:
-           write_dpt(int(a['sh_attributes']['knx_dpt'][0]), depth, f)   
+           write_dpt(int(a['sh_attributes']['knx_dpt'][0]), depth, f)
            del(a['sh_attributes']['type'])
            del(a['sh_attributes']['visu'])
            del(a['sh_attributes']['knx_dpt'])
@@ -71,7 +71,7 @@ def write_attributes(attr, depth, f):
             if len(val) > 0:
                 val += ", "
             val += v
-        write_param(u"{0} = {1}".format(k, val), depth, f)    
+        write_param(u"{0} = {1}".format(k, val), depth, f)
 
 def write_param(string, depth, f):
 	for i in range(depth):
@@ -131,7 +131,7 @@ for ga in root.findall('.//' + FIND_GA):
             item = a
             for part in parts:
                 item = item[part]
-            
+
             parts = match.group('sh_str').split('|',1)
             ga_str = ga2str(int(ga.attrib['Address']))
             ga_attributes = parts[0].split(',')
@@ -140,19 +140,19 @@ for ga in root.findall('.//' + FIND_GA):
                 if not ga_attribute in item['sh_attributes'].keys():
                     item['sh_attributes'][ga_attribute] = []
                 item['sh_attributes'][ga_attribute].append(ga_str)
-            
+
             if len(parts) > 1:
                 for part in parts[1].split('|'):
                     p = part.split('=')
                     if len(p) == 2:
                         if not p[0] in item['sh_attributes'].keys():
                             item['sh_attributes'][p[0]] = []
-                        item['sh_attributes'][p[0]].append(p[1].strip())                            
+                        item['sh_attributes'][p[0]].append(p[1].strip())
 
 for k in a.keys():
     OUTFILE = u"{0}.conf".format(k)
     print u"Create File: {0}".format(OUTFILE)
-    
+
     if (os.path.exists(OUTFILE)):
 	    os.remove(OUTFILE)
 

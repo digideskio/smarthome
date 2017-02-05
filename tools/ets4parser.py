@@ -4,20 +4,20 @@
 #########################################################################
 # Copyright 2012 KNX-User-Forum e.V.            http://knx-user-forum.de/
 #########################################################################
-#  This file is part of SmartHome.py.   http://smarthome.sourceforge.net/
+#  This file is part of SmartHomeNG.   https://github.com/smarthomeNG/
 #
-#  SmartHome.py is free software: you can redistribute it and/or modify
+#  SmartHomeNG is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  SmartHome.py is distributed in the hope that it will be useful,
+#  SmartHomeNG is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SmartHome.py. If not, see <http://www.gnu.org/licenses/>.
+#  along with SmartHomeNG. If not, see <http://www.gnu.org/licenses/>.
 ##########################################################################
 
 import os
@@ -47,13 +47,13 @@ def processBuildingPart(root, part, depth, f, dpts):
 
 	if part.attrib['Type'] != "DistributionBoard":
 		write_item(part.attrib['Name'], depth, f)
-		
+
 		for devref in part.findall(FIND_DEVICEREF):
 			processDevice(root, devref.attrib['RefId'], depth + 1, f, dpts)
 
 	for subpart in part.findall(FIND_BUILDINGPART):
 		processBuildingPart(root, subpart, depth + 1, f, dpts)
-		
+
 	f.write('\n')
 
 def processDevice(root, ref, depth, f, dpts):
@@ -191,5 +191,3 @@ else:
 		else:
 			for part in buildings:
 				processBuildingPart(root, part, 0, f, dpts)
-
-

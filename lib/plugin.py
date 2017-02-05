@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # vim: set encoding=utf-8 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 #########################################################################
-# Copyright 2011-2013 Marcus Popp                          marcus@popp.mx
-# Copyright 2016-  Christian Strassburg 
+# Copyright 2011-2013   Marcus Popp                        marcus@popp.mx
+# Copyright 2016-       Christian Strassburg
+# Copyright 2016-       Martin Sinn                         m.sinn@gmx.de
 #########################################################################
 #  This file is part of SmartHomeNG
 #
@@ -23,9 +24,12 @@
 import logging
 import threading
 import inspect
+import os.path		# until Backend is modified
 
 import lib.config
 from lib.model.smartplugin import SmartPlugin
+from lib.constants import (KEY_CLASS_NAME, KEY_CLASS_PATH, KEY_INSTANCE,YAML_FILE,CONF_FILE)
+
 logger = logging.getLogger(__name__)
 
 
@@ -37,29 +41,51 @@ class Plugins():
     _threads = []
 
     def __init__(self, smarthome, configfile):
-        try:
-            _conf = lib.config.parse(configfile)
-        except IOError as e:
-            logger.critical(e)
+
+        # until Backend plugin is modified
+        if os.path.isfile(configfile+ YAML_FILE):
+            smarthome._plugin_conf = configfile + YAML_FILE
+        else:
+            smarthome._plugin_conf = configfile + CONF_FILE
+
+
+        _conf = lib.config.parse_basename(configfile, configtype='plugin')
+        if _conf == {}:
             return
 
         for plugin in _conf:
             args = {}
             logger.debug("Plugin: {0}".format(plugin))
             for arg in _conf[plugin]:
-                if arg != 'class_name' and arg != 'class_path' and arg != 'instance':
+                if arg != KEY_CLASS_NAME and arg != KEY_CLASS_PATH and arg != KEY_INSTANCE:
                     value = _conf[plugin][arg]
                     if isinstance(value, str):
                         value = "'{0}'".format(value)
                     args[arg] = value
-            classname = _conf[plugin]['class_name']
-            classpath = _conf[plugin]['class_path']
-            
+            classname = _conf[plugin][KEY_CLASS_NAME]
+            classpath = _conf[plugin][KEY_CLASS_PATH]
+
             instance = ''
-            if 'instance' in _conf[plugin]:
-                instance = _conf[plugin]['instance'].strip()
-                if instance == 'default': 
+            if KEY_INSTANCE in _conf[plugin]:
+                instance = _conf[plugin][KEY_INSTANCE].strip()
+                if instance == 'default':
                     instance = ''
+
+            # give a warning if either a classic plugin uses the same class twice
+            # or if a SmartPlugin uses the same class and instance twice (due to a copy & paste error)
+            for p in self._plugins:
+                if isinstance(p, SmartPlugin):
+                    if p.get_instance_name() == instance:
+                        for t in self._threads:
+                            if t.plugin == p:
+                                if t.plugin.__class__.__name__ == classname:
+                                    prev_plugin = t._name
+                                    logger.warning("Plugin '{}' uses same class '{}' and instance '{}' as plugin '{}'".format(plugin, p.__class__.__name__, 'default' if instance == '' else instance, prev_plugin))
+                                    break
+
+                elif p.__class__.__name__ == classname:
+                    logger.warning("Multiple classic plugin instances of class '{}' detected".format(classname))
+
             try:
                 plugin_thread = PluginWrapper(smarthome, plugin, classname, classpath, args, instance)
                 self._threads.append(plugin_thread)
@@ -83,10 +109,10 @@ class Plugins():
         for plugin in self._threads:
             logger.debug('Stopping {} Plugin'.format(plugin.name))
             plugin.stop()
-    
+
     def get_plugin(self, name):
         """
-           returns one plugin with given name 
+           returns one plugin with given name
         """
         for thread in self._threads:
             if thread.name == name:
@@ -128,11 +154,11 @@ class PluginWrapper(threading.Thread):
             stops this plugin instance
         """
         self.plugin.stop()
-    
+
     def get_name(self):
         """
             returns the name of current plugin instance
-            :rtype: str 
+            :rtype: str
         """
         return self.name
 
@@ -142,7 +168,7 @@ class PluginWrapper(threading.Thread):
             :rtype: int
         """
         return self.ident
-    
+
     def get_implementation(self):
         """
             returns the implementation of current plugin instance

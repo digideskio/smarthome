@@ -3,11 +3,25 @@
 #########################################################################
 # Copyright 2016 Christian Strassburg  c.strassburg@gmx.de
 #########################################################################
-# Personal and non-commercial use only, redistribution is prohibited.
+#  This file is part of SmartHomeNG
+#
+#  SmartHomeNG is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  SmartHomeNG is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with SmartHomeNG  If not, see <http://www.gnu.org/licenses/>.
 #########################################################################
 
 import re
 import hashlib
+
 IP_REGEX = re.compile(r"""
         ^
         (?:
@@ -29,6 +43,8 @@ IP_REGEX = re.compile(r"""
         )
         $
     """, re.VERBOSE | re.IGNORECASE)
+
+TIMEFRAME_REGEX = re.compile(r'^(\d+)([ihdwmy]?)$', re.VERBOSE | re.IGNORECASE)
 
 class Utils(object):
 
@@ -77,7 +93,63 @@ class Utils(object):
             return False
 
     @staticmethod
+    def is_timeframe(string):
+        """
+        Checks if a string is a timeframe. A timeframe consists of a
+        number and an optional unit identifier (e.g. 2h, 30m, ...).
+        Unit identifiers are: i for minutes, h for hours, d for days,
+        w for weeks, m for months, y for years. If omitted milliseconds
+        are assumed.
+        :param string: String to check.
+        :type string: str
+        :return: True if a timeframe can be recognized, false otherwise.
+        :rtype: bool
+        """
+        try:
+            return bool(TIMEFRAME_REGEX.search(string))
+        except TypeError:
+            return False
+
+    @staticmethod
+    def to_timeframe(string):
+        """
+        Converts a timeframe value to milliseconds. See is_timeframe() method.
+        The special value 'now' is supported for the current time.
+        :param value : value to convert
+        :type value: str, int, ...
+        :return: True if cant be converted and is true, False otherwise.
+        :rtype: bool
+
+        """
+        minute = 60 * 1000
+        hour = 60 * minute
+        day = 24 * hour
+        week = 7 * day
+        month = 30 * day
+        year = 365 * day
+        frames = {'i': minute, 'h': hour, 'd': day, 'w': week, 'm': month, 'y': year}
+
+        if string == 'now':
+            string = '0'
+
+        if not Utils.is_timeframe(string):
+            raise Exception('Invalid value for boolean conversion: ' + string)
+
+        value, unit = TIMEFRAME_REGEX.match(string).groups()
+        if unit in frames:
+            return int(float(value) * frames[unit])
+        else:
+            return int(value)
+
+    @staticmethod
     def is_int(string):
+        """
+        Checks if a string is a integer.
+        :param string: String to check.
+        :type string: str
+        :return: True if a cast to int works, false otherwise.
+        :rtype: bool
+        """
         try:
             int(string)
             return True
@@ -88,6 +160,13 @@ class Utils(object):
 
     @staticmethod
     def is_float(string):
+        """
+        Checks if a string is a float.
+        :param string: String to check.
+        :type string: str
+        :return: True if a cast to float works, false otherwise.
+        :rtype: bool
+        """
         try:
             float(string)
             return True
@@ -97,26 +176,31 @@ class Utils(object):
             return False
 
     @staticmethod
-    def to_bool(value):
+    def to_bool(value, default='exception'):
         """
-        Converts a value to boolean. 
-        Raises exception if value is a string and can't be converted.
+        Converts a value to boolean.
+        Raises exception if value is a string and can't be converted and if no default value is given
         Case is ignored. These string values are allowed
-           True: 'True', "1", "true", "yes", "y", "t"
-           False: "", "0", "faLse", "no", "n", "f"
+           True: 'True', "1", "true", "yes", "y", "t", "on"
+           False: "", "0", "faLse", "no", "n", "f", "off"
         Non-string values are passed to bool constructor.
         :param value : value to convert
+        :param default: optional, value to return if value can not be parsed,
+        if default is not set this method throws an exception
         :type value: str, object, int, ...
         :return: True if cant be converted and is true, False otherwise.
         :rtype: bool
 
         """
         if type(value) == type(''):
-            if value.lower() in ("yes", "y", "true",  "t", "1"):
+            if value.lower() in ("yes", "y", "true",  "t", "1","on"):
                 return True
-            if value.lower() in ("no",  "n", "false", "f", "0", ""):
+            if value.lower() in ("no",  "n", "false", "f", "0", "off", ""):
                 return False
-            raise Exception('Invalid value for boolean conversion: ' + value)
+            if default=='exception':
+                raise Exception('Invalid value for boolean conversion: ' + value)
+            else:
+                return default
         return bool(value)
 
     @staticmethod
